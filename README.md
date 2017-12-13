@@ -26,4 +26,4 @@ new features after that :
 - adding a book by typing ISBN or taking a pic of the barcode
 
 
-
+p.-s. : for obvious reasons do not check-out the code yet !
