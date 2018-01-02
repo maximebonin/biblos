@@ -4,11 +4,11 @@ declare(strict_types = 1);
 
 namespace biblos;
 
-    /**
-     * for error handling
-     */
-    require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
+    /**
+     * error handling
+     */
     error_reporting(E_ALL);
     $environment = 'development';
 
@@ -30,8 +30,35 @@ namespace biblos;
     $request = new \Http\HttpRequest($_GET, $_POST, $_COOKIE, $_FILES, $_SERVER);
     $response = new \Http\HttpResponse;
 
-    $content = '<h1>Hello the world of Open source fanatics !!!</h1>';
-    $response->setContent($content);
+    /**
+     * rooting  -- a demo for now
+     */
+    $dispatcher = \FastRoute\simpleDispatcher(function (\FastRoute\RouteCollector $r) {
+    $r->addRoute('GET', '/hello-world', function () {
+        echo 'Hello World';
+        });
+    $r->addRoute('GET', '/another-route', function () {
+        echo 'This works too';
+        });
+    });
+
+    $currentURI = StringUtils::getCurrentUri();
+    $routeInfo = $dispatcher->dispatch($request->getMethod(), $currentURI);
+    switch ($routeInfo[0]) {
+        case \FastRoute\Dispatcher::NOT_FOUND:
+            $response->setContent('404 - Page not found');
+            $response->setStatusCode(404);
+            break;
+        case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+            $response->setContent('405 - Method not allowed');
+            $response->setStatusCode(405);
+            break;
+        case \FastRoute\Dispatcher::FOUND:
+            $handler = $routeInfo[1];
+            $vars = $routeInfo[2];
+            call_user_func($handler, $vars);
+            break;
+    }
 
     /**
      * output to browser
