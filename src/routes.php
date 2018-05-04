@@ -2,7 +2,6 @@
 
 declare(strict_types = 1);
 
-
 return [
-    ['GET', '/', ['biblos\Controllers\Homepage', 'show']]
+    ['GET', '/', ['biblos\Controllers\Homepage', 'show']],
 ];
