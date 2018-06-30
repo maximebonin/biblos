@@ -6,11 +6,12 @@ namespace biblos;
 
     error_reporting(E_ALL);
 
-    $environment = 'development';
+    $environment = 'production';
 
     /**
      * Register the error handler
      */
+
     $whoops = new \Whoops\Run;
     if ($environment !== 'production') {
         $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
@@ -21,20 +22,22 @@ namespace biblos;
     }
     $whoops->register();
 
-    //throw new \Exception;
+    throw new \Exception;
 
     /**
      * rooting
      */
 
-    $dispatcher = \FastRoute\simpleDispatcher(function (\FastRoute\RouteCollector $r) {
-        $r->addRoute('GET', '/hello-world', function () {
-            echo 'Hello World';
-        });
-        $r->addRoute('GET', '/another-route', function () {
-            echo 'This works too';
-        });
-    });
+    /**
+
+    $routeDefinitionCallback = function (\FastRoute\RouteCollector $r) {
+        $routes = include('routes.php');
+        foreach ($routes as $route) {
+            $r->addRoute($route[0], $route[1], $route[2]);
+        }
+    };
+
+    $dispatcher = \FastRoute\simpleDispatcher($routeDefinitionCallback);
 
     $request = new \Http\HttpRequest($_GET, $_POST, $_COOKIE, $_FILES, $_SERVER);
     $response = new \Http\HttpResponse;
@@ -55,6 +58,6 @@ namespace biblos;
             call_user_func($handler, $vars);
             break;
     }
-
+**/
 
 
