@@ -13,7 +13,7 @@ namespace biblos;
      */
 
     $whoops = new \Whoops\Run;
-    if ($environment !== 'production') {
+    if ($environment !== 'development') {
         $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
     } else {
         $whoops->pushHandler(function($e){
@@ -22,13 +22,22 @@ namespace biblos;
     }
     $whoops->register();
 
-    throw new \Exception;
+    //throw new \Exception;
 
     /**
-     * rooting
+     * HTTP wrapper
      */
 
+    $request = new \Http\HttpRequest($_GET, $_POST, $_COOKIE, $_FILES, $_SERVER);
+    $response = new \Http\HttpResponse;
+
+    foreach ($response->getHeaders() as $header){
+        header($header, false);
+    }
+
     /**
+     * routing
+     */
 
     $routeDefinitionCallback = function (\FastRoute\RouteCollector $r) {
         $routes = include('routes.php');
@@ -38,14 +47,12 @@ namespace biblos;
     };
 
     $dispatcher = \FastRoute\simpleDispatcher($routeDefinitionCallback);
-
-    $request = new \Http\HttpRequest($_GET, $_POST, $_COOKIE, $_FILES, $_SERVER);
-    $response = new \Http\HttpResponse;
     
     $routeInfo = $dispatcher->dispatch($request->getMethod(), $request->getPath());
+
     switch ($routeInfo[0]) {
         case \FastRoute\Dispatcher::NOT_FOUND:
-            $response->setContent('404 - Page not found');
+            $response->setContent('<h1>404 - Page not found</h1>');
             $response->setStatusCode(404);
             break;
         case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
@@ -58,6 +65,9 @@ namespace biblos;
             call_user_func($handler, $vars);
             break;
     }
-**/
+
+    echo $response->getContent();
+
+
 
 
